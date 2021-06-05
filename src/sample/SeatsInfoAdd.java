@@ -8,9 +8,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -30,10 +35,15 @@ public class SeatsInfoAdd {
         window = new Stage();
         ConnectionClass connectionClass = new ConnectionClass();
         Connection connection = connectionClass.getConnection();
+        BackgroundFill background_fill = new BackgroundFill(Color.web("#ffe0bd"),
+                CornerRadii.EMPTY, Insets.EMPTY);
+
+        // create Background
+        Background background = new Background(background_fill);
 
         Label label = new Label("Add new train details/ Update existing train details");
-        label.setFont(new Font("Arial", 30));
-        label.setTextFill(Color.web("#ff0000", 1));
+        label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label.setTextFill(Color.web("#003153", 1));
 
         Label label1 = new Label("Train number");
         Label label2 = new Label("Sleeper seats");
@@ -67,6 +77,14 @@ public class SeatsInfoAdd {
         accSeats.setMaxWidth(300);
 
         DatePicker d = new DatePicker();
+        d.setDayCellFactory(picker -> new DateCell() {
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                LocalDate today = LocalDate.now();
+
+                setDisable(empty || date.compareTo(today) < 0 );
+            }
+        });
         Label label8 = new Label("Date");
 
 
@@ -156,9 +174,9 @@ public class SeatsInfoAdd {
         layout.setPadding(new Insets(10,10,10,10));
         layout.getChildren().addAll(label, label1, tno, label2, sleeperSeats, label3, acTwoSeats, label4, acThreeSeats, label5, firstSeats, label6, ccSeats,
                 label7, accSeats, label8, d, button);
+        layout.setBackground(background);
 
-
-        Scene scene = new Scene(layout, 700,900);
+        Scene scene = new Scene(layout, 900,900);
         window.setScene(scene);
 
         window.show();

@@ -12,12 +12,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.FileInputStream;
@@ -43,19 +42,27 @@ public class Main extends Application {
         Connection connection = connectionClass.getConnection();
 
         window.setTitle("Indian Railways");
+        // create a scene
+        BackgroundFill background_fill = new BackgroundFill(Color.web("#ffe0bd"),
+                CornerRadii.EMPTY, Insets.EMPTY);
+
+        // create Background
+        Background background = new Background(background_fill);
+
+
 
         // create a label
         Label label = new Label("Welcome to Indian Railways");
-        label.setFont(new Font("Arial", 30));
-        label.setTextFill(Color.web("#ff0000", 1));
+        label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label.setTextFill(Color.web("#003153", 1));
 
         Label labelReg = new Label("Register Here");
-        labelReg.setFont(new Font("Arial", 30));
-        labelReg.setTextFill(Color.web("#ff0000", 1));
+        labelReg.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 25));
+        labelReg.setTextFill(Color.web("#003153", 1));
 
         Label labelLogin = new Label("Login Here");
-        labelLogin.setFont(new Font("Arial", 30));
-        labelLogin.setTextFill(Color.web("#ff0000", 1));
+        labelLogin.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 25));
+        labelLogin.setTextFill(Color.web("#003153", 1));
 
 
         Button button = new Button("Register");
@@ -65,8 +72,8 @@ public class Main extends Application {
 
         //Scene 4 after login
         Label labelAdmin = new Label("Welcome to Indian Railways Admin Panel.\nYou are currently logged in.");
-        labelAdmin.setFont(new Font("Arial", 30));
-
+        labelAdmin.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        labelAdmin.setTextFill(Color.web("#003153", 1));
 
 
 
@@ -90,7 +97,13 @@ public class Main extends Application {
 
         Menu quitAdmin = new Menu("Quit");
         MenuItem logOutAdmin = new MenuItem("Log Out");
+        logOutAdmin.setOnAction(e -> {
+            window.setScene(scene1);
+        });
         MenuItem exitPageAdmin = new MenuItem("Exit");
+        exitPageAdmin.setOnAction(e -> {
+            window.close();
+        });
         quitAdmin.getItems().addAll(logOutAdmin, exitPageAdmin);
 
         MenuBar menuBarAdmin = new MenuBar();
@@ -99,22 +112,29 @@ public class Main extends Application {
         BorderPane layout5 = new BorderPane();
         layout5.setTop(menuBarAdmin);
         layout5.setCenter(labelAdmin);
+        layout5.setBackground(background);
 
-        scene5 = new Scene(layout5, 700,700);
+        scene5 = new Scene(layout5, 900,500);
 
         Label l1 = new Label("Admin Password");
         PasswordField p1 = new PasswordField();
+        Button adminBack = new Button("Back");
         p1.setPrefWidth(300);
         p1.setMaxWidth(300);
 
         Button logAdmin = new Button("Log in");
 
         VBox lay = new VBox(30);
-        lay.getChildren().addAll(l1, p1, logAdmin);
+        lay.setPadding(new Insets(20,10,10,20));
+        lay.getChildren().addAll(adminBack,l1, p1, logAdmin);
+        lay.setBackground(background);
+
         Scene adminLogin = new Scene(lay, 300,300);
 
 
-
+        adminBack.setOnAction(e -> {
+            window.setScene(scene1);
+        });
 
         buttonAdmin.setOnAction(e -> {
             window.setScene(adminLogin);
@@ -161,9 +181,12 @@ public class Main extends Application {
 
 
         root.getChildren().addAll(label, button, button1, buttonAdmin);
+        // set background
+        root.setBackground(background);
 
-        // create a scene
-        scene1 = new Scene(root, 450, 350);
+
+        //scene1
+        scene1 = new Scene(root, 550, 350);
 
 
 
@@ -220,12 +243,12 @@ public class Main extends Application {
             }
         });
 
-        Button button2 =new Button("Register");
+
         Button goBackReg = new Button("Back");
         goBackReg.setOnAction(e -> window.setScene(scene1));
         Label alertReg = new Label();
 
-
+        Button button2 =new Button("Register");
         button2.setOnAction(e -> {
             String nameInput = name.getText();
             String emailInput = email.getText();
@@ -282,7 +305,8 @@ public class Main extends Application {
                                         alertReg.setText("Invalid mobile number.");
                                     }
                                     else{
-                                        String sql1 = "INSERT INTO users VALUES('"+ nameInput +"','"+ emailInput +  "','" +  contactInput +  "','"+
+                                        String sql1 = "INSERT INTO users VALUES('"+ nameInput +"','"+ emailInput +  "','" +
+                                                contactInput +  "','"+
                                                 genderInput + "','" + passwordInput  +"');";
 
                                         Statement statement1 = null;
@@ -308,24 +332,14 @@ public class Main extends Application {
 
                                 }
 
-
                             }
 
-
                         }
-
-
-
-
-                    } catch (SQLException throwables) {
+                 } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
 
-
             }
-
-
-
 
         });
 
@@ -336,7 +350,7 @@ public class Main extends Application {
 
 
 
-
+        layout1.setBackground(background);
 
         scene2 = new Scene(layout1, 700,650);
 
@@ -352,7 +366,7 @@ public class Main extends Application {
         passwordLogin.setPrefWidth(300);
         passwordLogin.setMaxWidth(300);
 
-        Button button3 =new Button("Login");
+
         Button goBackLogin = new Button("Back");
 
         Label loginAlert = new Label();
@@ -361,10 +375,11 @@ public class Main extends Application {
 
         VBox layout2 = new VBox(20);
         layout2.setPadding(new Insets(30,10,10,30));
-        layout2.getChildren().addAll(goBackLogin,labelLogin, label6, emailLogin, label7, passwordLogin, button3, loginAlert);
 
 
+        layout2.setBackground(background);
         //login
+        Button button3 =new Button("Login");
         button3.setOnAction(e -> {
             String emailInputLogin = emailLogin.getText();
             String passwordInputLogin = passwordLogin.getText();
@@ -381,9 +396,7 @@ public class Main extends Application {
                     window.setScene(scene2);
 
                 }
-
                 else {
-
 
                     System.out.println("Record found");
                     String passwordUser = resultSet.getString(5);
@@ -396,7 +409,6 @@ public class Main extends Application {
 
                     }
 
-
                 }
 
 
@@ -404,13 +416,9 @@ public class Main extends Application {
                 throwables.printStackTrace();
             }
 
-
-
-
-
         });
 
-
+        layout2.getChildren().addAll(goBackLogin,labelLogin, label6, emailLogin, label7, passwordLogin, button3, loginAlert);
         scene3 = new Scene(layout2, 600,400);
 
 
@@ -434,7 +442,8 @@ public class Main extends Application {
         //Scene 4 after login
         InputStream stream = new FileInputStream("C:\\Users\\MOHAN\\IdeaProjects\\RailwayManagement\\src\\indiarailway.jpg");
         Label label8 = new Label("Welcome to Indian Railways.\nYou are currently logged in.");
-        label8.setFont(new Font("Arial", 30));
+        label8.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label8.setTextFill(Color.web("#003153", 1));
         Image image = new Image(stream);
         //Creating the image view
         ImageView imageView = new ImageView();
@@ -447,6 +456,7 @@ public class Main extends Application {
         imageView.setPreserveRatio(true);
         VBox lay1 = new VBox(20);
         lay1.getChildren().addAll(label8, imageView);
+        lay1.setBackground(background);
         lay1.setPadding(new Insets(10,10,10,10));
         //Group im = new Group(imageView);
 
@@ -491,7 +501,13 @@ public class Main extends Application {
 
         Menu quit = new Menu("Quit");
         MenuItem logOut = new MenuItem("Log Out");
+        logOut.setOnAction(e -> {
+            window.setScene(scene1);
+        });
         MenuItem exitPage = new MenuItem("Exit");
+        exitPage.setOnAction(e -> {
+            window.close();
+        });
         quit.getItems().addAll(logOut, exitPage);
 
         MenuBar menuBar = new MenuBar();
@@ -501,13 +517,8 @@ public class Main extends Application {
         layout3.setTop(menuBar);
         layout3.setCenter(lay1);
 
+
         scene4 = new Scene(layout3, 700,700);
-
-
-
-
-
-
 
 
 

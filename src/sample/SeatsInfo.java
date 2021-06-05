@@ -9,10 +9,11 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
@@ -20,6 +21,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SeatsInfo {
@@ -40,14 +44,28 @@ public class SeatsInfo {
         ConnectionClass connectionClass = new ConnectionClass();
         Connection connection = connectionClass.getConnection();
 
+        BackgroundFill background_fill = new BackgroundFill(Color.web("#ffe0bd"),
+                CornerRadii.EMPTY, Insets.EMPTY);
+
+        // create Background
+        Background background = new Background(background_fill);
+
         Label label1 = new Label("Check availability");
-        label1.setFont(new Font("Arial", 30));
-        label1.setTextFill(Color.web("#ff0000", 1));
+        label1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label1.setTextFill(Color.web("#003153", 1));
 
         Label label = new Label("Train number");
 
         Label label2 = new Label("Travel Date");
         DatePicker d = new DatePicker();
+        d.setDayCellFactory(picker -> new DateCell() {
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                LocalDate today = LocalDate.now();
+
+                setDisable(empty || date.compareTo(today) < 0 );
+            }
+        });
 
         TextField tno = new TextField();
         tno.setPrefWidth(300);
@@ -308,8 +326,8 @@ public class SeatsInfo {
 
 
         Label label7 = new Label("Book here");
-        label7.setFont(new Font("Arial", 30));
-        label7.setTextFill(Color.web("#ff0000", 1));
+        label7.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label7.setTextFill(Color.web("#003153", 1));
 
 
         classComboBox = new ComboBox<String>();
@@ -396,13 +414,42 @@ public class SeatsInfo {
                     int sNo  = Integer.parseInt(seats);
                     System.out.println(seats);
 
+                    Integer[]seatList = new Integer[300];
+                    int x = 0;
+                    int max_seats = 0;
+
+
+
 
                     int wl_no=-1;
                     if(sNo > 0){
+
                         wl_no = -1;
+                        String sqlSeats = "SELECT * FROM passengers WHERE seat_number > 0 AND train_number='"+ currTno + "' AND traveldate='" + currDate + "' AND class='"+ classInput +"';";
+                        ResultSet rsSeats = statement.executeQuery(sqlSeats);
+                        while (rsSeats.next()){
+                            seatList[x++] = Integer.parseInt(rsSeats.getString(9));
+                            if(Integer.parseInt(rsSeats.getString(9)) > max_seats){
+                                max_seats = Integer.parseInt(rsSeats.getString(9));
+                            }
+                        }
+                        List<Integer> seatListInt = new ArrayList<>(Arrays.asList(seatList));
+                        if(x > 0){
+                            if(max_seats >= sNo){
+                                for(int i = max_seats; i >= 1; i--){
+                                    if(!seatListInt.contains(i)){
+                                        sNo = i;
+                                        break;
+                                    }
+                                }
+                            }
+
+
+                        }
+
                     }
                     else{
-                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate + "';";
+                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate + "' AND class='"+ classInput + "';";
                         ResultSet rsss1 = statement.executeQuery(sqlll);
                         rsss1.next();
 
@@ -479,11 +526,38 @@ public class SeatsInfo {
 
 
                     int wl_no=-1;
+                    Integer[]seatList = new Integer[300];
+                    int x = 0;
+                    int max_seats = 0;
+
                     if(sNo > 0){
+
                         wl_no = -1;
+                        String sqlSeats = "SELECT * FROM passengers WHERE seat_number > 0 AND train_number='"+ currTno + "' AND traveldate='" + currDate + "' AND class='"+ classInput +"';";
+                        ResultSet rsSeats = statement.executeQuery(sqlSeats);
+                        while (rsSeats.next()){
+                            seatList[x++] = Integer.parseInt(rsSeats.getString(9));
+                            if(Integer.parseInt(rsSeats.getString(9)) > max_seats){
+                                max_seats = Integer.parseInt(rsSeats.getString(9));
+                            }
+                        }
+                        List<Integer> seatListInt = new ArrayList<>(Arrays.asList(seatList));
+                        if(x > 0){
+                            if(max_seats >= sNo){
+                                for(int i = max_seats; i >= 1; i--){
+                                    if(!seatListInt.contains(i)){
+                                        sNo = i;
+                                        break;
+                                    }
+                                }
+                            }
+
+
+                        }
+
                     }
                     else{
-                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate + "';";
+                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate  + "' AND class='"+ classInput + "';";
                         ResultSet rsss1 = statement.executeQuery(sqlll);
 
                         rsss1.next();
@@ -559,12 +633,38 @@ public class SeatsInfo {
                     System.out.println(seats);
 
 
-                    int wl_no=-1;
+                    Integer[]seatList = new Integer[300];
+                    int x = 0;
+                    int max_seats = 0;
+                    int wl_no = -1;
                     if(sNo > 0){
+
                         wl_no = -1;
+                        String sqlSeats = "SELECT * FROM passengers WHERE seat_number > 0 AND train_number='"+ currTno + "' AND traveldate='" + currDate + "' AND class='"+ classInput +"';";
+                        ResultSet rsSeats = statement.executeQuery(sqlSeats);
+                        while (rsSeats.next()){
+                            seatList[x++] = Integer.parseInt(rsSeats.getString(9));
+                            if(Integer.parseInt(rsSeats.getString(9)) > max_seats){
+                                max_seats = Integer.parseInt(rsSeats.getString(9));
+                            }
+                        }
+                        List<Integer> seatListInt = new ArrayList<>(Arrays.asList(seatList));
+                        if(x > 0){
+                            if(max_seats >= sNo){
+                                for(int i = max_seats; i >= 1; i--){
+                                    if(!seatListInt.contains(i)){
+                                        sNo = i;
+                                        break;
+                                    }
+                                }
+                            }
+
+
+                        }
+
                     }
                     else{
-                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate + "';";
+                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate  + "' AND class='"+ classInput + "';";
                         ResultSet rsss1 = statement.executeQuery(sqlll);
 
                         rsss1.next();
@@ -639,12 +739,38 @@ public class SeatsInfo {
                     System.out.println(seats);
 
 
-                    int wl_no=-1;
+                    Integer[]seatList = new Integer[300];
+                    int x = 0;
+                    int max_seats = 0;
+                    int wl_no = -1;
                     if(sNo > 0){
+
                         wl_no = -1;
+                        String sqlSeats = "SELECT * FROM passengers WHERE seat_number > 0 AND train_number='"+ currTno + "' AND traveldate='" + currDate + "' AND class='"+ classInput +"';";
+                        ResultSet rsSeats = statement.executeQuery(sqlSeats);
+                        while (rsSeats.next()){
+                            seatList[x++] = Integer.parseInt(rsSeats.getString(9));
+                            if(Integer.parseInt(rsSeats.getString(9)) > max_seats){
+                                max_seats = Integer.parseInt(rsSeats.getString(9));
+                            }
+                        }
+                        List<Integer> seatListInt = new ArrayList<>(Arrays.asList(seatList));
+                        if(x > 0){
+                            if(max_seats >= sNo){
+                                for(int i = max_seats; i >= 1; i--){
+                                    if(!seatListInt.contains(i)){
+                                        sNo = i;
+                                        break;
+                                    }
+                                }
+                            }
+
+
+                        }
+
                     }
                     else{
-                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate + "';";
+                        String sqlll = "SELECT IFNULL(MAX(waitlist_number), 0) AS MaxWL FROM passengers WHERE train_number='" + currTno + "' AND traveldate='" + currDate  + "' AND class='"+ classInput + "';";
                         ResultSet rsss1 = statement.executeQuery(sqlll);
 
                         rsss1.next();
@@ -678,12 +804,6 @@ public class SeatsInfo {
             }
 
 
-
-
-
-
-
-
             AlertBox.display("Successfully booked! Your PNR number is: "+ (pnrno+1)+" Generate ticket now.");
             name1.setText("");
             name2.setText("");
@@ -708,6 +828,7 @@ public class SeatsInfo {
                 p2, pname2, name2, page2, age2, pg2, r2,
                 p3, pname3, name3, page3, age3, pg3, r3,
                 p4, pname4, name4, page4, age4, pg4, r4, button2);
+        //layout1.setBackground(background);
 
         ScrollPane sp = new ScrollPane();
         sp.setContent(layout1);
@@ -741,15 +862,12 @@ public class SeatsInfo {
 
         });
 
-
-
-
-
         //Layout
         VBox layout = new VBox(30);
         layout.setPadding(new Insets(10,10,10,10));
 
         layout.getChildren().addAll(label1, label , tno, label2, d,button, table, button1);
+        layout.setBackground(background);
 
 
 
@@ -757,16 +875,6 @@ public class SeatsInfo {
         window.setScene(scene);
 
         window.show();
-
-
-
-
-
-
-
-
-
-
 
 
 

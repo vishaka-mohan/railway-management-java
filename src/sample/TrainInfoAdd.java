@@ -7,9 +7,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -32,10 +37,15 @@ public class TrainInfoAdd  {
         window = new Stage();
         ConnectionClass connectionClass = new ConnectionClass();
         Connection connection = connectionClass.getConnection();
+        BackgroundFill background_fill = new BackgroundFill(Color.web("#ffe0bd"),
+                CornerRadii.EMPTY, Insets.EMPTY);
+
+        // create Background
+        Background background = new Background(background_fill);
 
         Label label = new Label("Add trains");
-        label.setFont(new Font("Arial", 30));
-        label.setTextFill(Color.web("#ff0000", 1));
+        label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label.setTextFill(Color.web("#003153", 1));
 
 
         Label label1 = new Label("Train number");
@@ -128,7 +138,6 @@ public class TrainInfoAdd  {
 
                         AlertBox.display("This train number already exists.");
 
-
                     }
                     else{
                         try {
@@ -150,30 +159,27 @@ public class TrainInfoAdd  {
                             throwables.printStackTrace();
                         }
 
-
-
                     }
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
-
-
-
-
-
-
 
         });
 
 
 
         //Layout
-        VBox layout = new VBox();
+        VBox layout = new VBox(20);
         layout.setPadding(new Insets(10,10,10,10));
         layout.getChildren().addAll(label, label1, tno, label2, tname, label3, sourceComboBox, label4, destinationComboBox,
                 label5, box1, box2 , box3,box4,box5,box6,box7, label6, departure, label7, arrival, label8, distance, label9, duration, button);
+        //layout.setBackground(background);
+        ScrollPane sp = new ScrollPane();
+        sp.setContent(layout);
 
-        Scene scene = new Scene(layout, 700,900);
+
+
+        Scene scene = new Scene(sp, 800,700);
         window.setScene(scene);
 
         window.show();

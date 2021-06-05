@@ -29,7 +29,7 @@ public class AlertBox {
         //alignment
         layout.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(layout, 400,100);
+        Scene scene = new Scene(layout, 500,100);
         window.setScene(scene);
 
         //show and wait to block everything else

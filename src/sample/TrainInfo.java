@@ -7,9 +7,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -31,15 +36,21 @@ public class TrainInfo {
         Stage window = new Stage();
         ConnectionClass connectionClass = new ConnectionClass();
         Connection connection = connectionClass.getConnection();
+        BackgroundFill background_fill = new BackgroundFill(Color.web("#ffe0bd"),
+                CornerRadii.EMPTY, Insets.EMPTY);
+
+        // create Background
+        Background background = new Background(background_fill);
+
 
         //window in focus
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Train information");
         window.setMinWidth(250);
 
-        Label label3 = new Label("Welcome to Indian Railways");
-        label3.setFont(new Font("Arial", 30));
-        label3.setTextFill(Color.web("#ff0000", 1));
+        Label label3 = new Label("Check train information");
+        label3.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label3.setTextFill(Color.web("#003153", 1));
 
         Label label = new Label("Source");
         Label label1 = new Label("Destination");
@@ -74,6 +85,14 @@ public class TrainInfo {
         destinationComboBox.setEditable(true);
 
         DatePicker d = new DatePicker();
+        d.setDayCellFactory(picker -> new DateCell() {
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                LocalDate today = LocalDate.now();
+
+                setDisable(empty || date.compareTo(today) < 0 );
+            }
+        });
 
         Button button = new Button("Search for trains!");
         Label label4 = new Label();
@@ -129,14 +148,6 @@ public class TrainInfo {
 
 
         button.setOnAction(e -> {
-
-
-
-
-
-
-
-
 
             String source = sourceComboBox.getValue();
             String destination = destinationComboBox.getValue();
@@ -194,6 +205,7 @@ public class TrainInfo {
         layout.setPadding(new Insets(20,20,20,20));
         layout.getChildren().addAll( label3, label, sourceComboBox, label1, destinationComboBox
                                         ,label2, d, button, table);
+        layout.setBackground(background);
 
         Scene scene = new Scene(layout, 1800,900);
         window.setScene(scene);

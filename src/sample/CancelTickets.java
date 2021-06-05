@@ -9,10 +9,11 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.sql.*;
@@ -23,15 +24,23 @@ public class CancelTickets {
     static Stage window = new Stage();
 
     static TableView<Passenger> table = new TableView<>();
+    static int seatNo1, wlNo1;
+    static String currTno,  currDate,currClass ;
+
 
     public static void display(){
 
         ConnectionClass connectionClass = new ConnectionClass();
         Connection connection = connectionClass.getConnection();
+        BackgroundFill background_fill = new BackgroundFill(Color.web("#ffe0bd"),
+                CornerRadii.EMPTY, Insets.EMPTY);
+
+        // create Background
+        Background background = new Background(background_fill);
 
         Label label1 = new Label("Cancel tickets");
-        label1.setFont(new Font("Arial", 30));
-        label1.setTextFill(Color.web("#ff0000", 1));
+        label1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        label1.setTextFill(Color.web("#003153", 1));
 
         Label label = new Label("Enter pnr");
         TextField pnr = new TextField();
@@ -159,11 +168,42 @@ public class CancelTickets {
             try {
                 statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql);
+
+
+
                 if (!resultSet.isBeforeFirst()){
                     AlertBox.display("Enter a valid passenger id");
 
                 }else {
+                    if(resultSet.next()){
+                        seatNo1 = Integer.parseInt(resultSet.getString(9));
+                        wlNo1 = Integer.parseInt(resultSet.getString(10));
+                        currTno = resultSet.getString(8);
+                        currDate = resultSet.getString(5);
+                        currClass = resultSet.getString(6);
+                    }
+
+                    String classCol = "";
+                    if(currClass.equals("Sleeper")){
+                        classCol = "sleeper";
+                    }
+                    else if(currClass.equals("AC 2 tier")){
+                        classCol = "ac_two";
+                    }
+                    else if(currClass.equals("AC 3 tier")){
+                        classCol = "ac_three";
+                    }
+                    else if(currClass.equals("First class")){
+                        classCol = "first_class";
+                    }
+                    else if(currClass.equals("Chair car")){
+                        classCol = "cc";
+                    }
+                    else if(currClass.equals("AC Chair car")){
+                        classCol = "ac_cc";
+                    }
                     String sql1 = "DELETE FROM passengers WHERE pid ='" + pidInput +"';";
+
                     PreparedStatement preparedStmt = connection.prepareStatement(sql1);
                     preparedStmt.execute();
                     AlertBox.display("Ticket cancelled successfully.");
@@ -171,32 +211,38 @@ public class CancelTickets {
 
                     String sql2 = "SELECT * FROM passengers WHERE pnr='"+ pnrInput + "';";
                     //Statement statement1 = null;
+
+                    String sql3 = "UPDATE passengers SET waitlist_number = waitlist_number - 1 " +
+                            "WHERE waitlist_number > "+ wlNo1 +" AND train_number='" + currTno + "' AND traveldate='" + currDate + "' AND class='"+ currClass + "';";
+                    String sql4 = "UPDATE passengers SET seat_number = '"+ seatNo1 +
+                            "' WHERE waitlist_number = 0 AND seat_number = 0 AND train_number='" + currTno + "' AND traveldate='" + currDate + "' AND class='"+ currClass + "';";
+                    String sql5 = "UPDATE traininfo SET "+ classCol + "= "+ classCol+ "+1 " +
+                            "WHERE train_number='" + currTno + "' AND datetravel='" + currDate + "';";
+
+                    String sql6 = "SELECT * FROM passengers WHERE waitlist_number > 0 AND train_number='" + currTno + "' AND traveldate='" + currDate  + "' AND class='"+ currClass + "';";
+
                     try {
-                        statement = connection.createStatement();
-                        ResultSet resultSet1 = statement.executeQuery(sql2);
-                        System.out.println("yes");
 
-
-                        while(resultSet1.next()){
-
-                            String currSeat, wlNo;
-
-                            if(Integer.parseInt(resultSet1.getString(9)) != 0){
-                                currSeat = resultSet1.getString(9);
-                                wlNo = "-";
-
-                            }
-                            else{
-                                currSeat = "-";
-                                wlNo = resultSet1.getString(10);
-                            }
-
-                            passengers.add(new Passenger(resultSet1.getString(8), resultSet1.getString(1), resultSet1.getString(2),
-                                    resultSet1.getString(3), resultSet1.getString(4),
-                                    resultSet1.getString(6), resultSet1.getString(7),
-                                    resultSet1.getString(5), currSeat , wlNo));
+                        ResultSet resultSet2 = statement.executeQuery(sql6);
+                        if(!resultSet2.next() && wlNo1==0){
+                            PreparedStatement pstmt2 = connection.prepareStatement(sql5);
+                            //statement.executeUpdate(sql3);
+                            int rowAffected2 = pstmt2.executeUpdate();
+                            System.out.println(rowAffected2);
                         }
+                        else{
+                            PreparedStatement pstmt = connection.prepareStatement(sql3);
+                            //statement.executeUpdate(sql3);
+                            int rowAffected = pstmt.executeUpdate();
+                            System.out.println(rowAffected);
+                            //AlertBox.display("Updated.");
+                            if(wlNo1 == 0) {
 
+                                PreparedStatement pstmt1 = connection.prepareStatement(sql4);
+                                int rowAffected1 = pstmt1.executeUpdate();
+                                System.out.println(rowAffected1);
+                          }
+                        }
 
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
@@ -216,6 +262,7 @@ public class CancelTickets {
         layout.setPadding(new Insets(10,10,10,10));
 
         layout.getChildren().addAll(label1, label, pnr,  button, label2, pid, table, button2);
+        layout.setBackground(background);
 
 
         Scene scene = new Scene(layout, 900,900);

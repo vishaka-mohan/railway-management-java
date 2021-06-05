@@ -6,8 +6,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -33,6 +32,12 @@ public class TicketGenerate {
         Stage window = new Stage();
         ConnectionClass connectionClass = new ConnectionClass();
         Connection connection = connectionClass.getConnection();
+
+        BackgroundFill background_fill = new BackgroundFill(Color.web("#ffe0bd"),
+                CornerRadii.EMPTY, Insets.EMPTY);
+
+        // create Background
+        Background background = new Background(background_fill);
 
         //window in focus
         window.initModality(Modality.APPLICATION_MODAL);
@@ -156,10 +161,11 @@ public class TicketGenerate {
         grid.setPadding(new Insets(10,10,10,10));
 
         //vertical and horizontal spacing
-        grid.setHgap(5);
+        grid.setHgap(3);
         grid.setVgap(8);
         grid.getChildren().addAll( label1,label2, label3, label4, label5, label6, label7, label8, label9, label10,
                                    tno,tname,source, departure,destination,arrival,duration,travelDate,distance,pnrNo, table );
+        grid.setBackground(background);
         Scene scene1 = new Scene(grid, 1200,1200);
 
 
@@ -266,6 +272,7 @@ public class TicketGenerate {
 
         layout.setPadding(new Insets(20,20,20,20));
         layout.getChildren().addAll( label11, pnr, button);
+        layout.setBackground(background);
 
         Scene scene = new Scene(layout, 300,500);
         window.setScene(scene);
